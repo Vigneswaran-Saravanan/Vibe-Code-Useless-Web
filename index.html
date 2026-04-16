@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DumbGenius AI</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: radial-gradient(circle at top, rgba(166, 124, 255, 0.14), transparent 24%), linear-gradient(180deg, #09070f 0%, #05030a 100%);
+      --surface: rgba(22, 18, 40, 0.92);
+      --surface-strong: rgba(30, 24, 56, 0.96);
+      --surface-lighter: rgba(255, 255, 255, 0.04);
+      --text: #ece8ff;
+      --muted: #ab9ce2;
+      --accent: #a67cff;
+      --accent-strong: #bb9dff;
+      --button-secondary-bg: rgba(255, 255, 255, 0.08);
+      --button-secondary-text: var(--text);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+      --radius: 30px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: min(100%, 980px);
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      backdrop-filter: blur(12px);
+    }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(166, 124, 255, 0.2), transparent 35%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      margin: 18px auto 0;
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+
+    .hero .pill {
+      display: inline-flex;
+      padding: 10px 18px;
+      margin-top: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(166, 124, 255, 0.24);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 0.94rem;
+      letter-spacing: 0.01em;
+    }
+
+    .panel h2 {
+      margin-bottom: 12px;
+      font-size: 1.15rem;
+    }
+
+    .panel span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .input-area {
+      display: grid;
+      gap: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      padding: 22px;
+      resize: vertical;
+      font-size: 1rem;
+      line-height: 1.7;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: rgba(166, 124, 255, 0.8);
+      box-shadow: 0 0 0 6px rgba(166, 124, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .button-row button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+      min-height: 52px;
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .button-row button.primary {
+      background: linear-gradient(135deg, #c994ff, #8970ff);
+      color: #0f0b19;
+    }
+
+    .button-row button.secondary {
+      background: var(--button-secondary-bg);
+      color: var(--button-secondary-text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: none;
+    }
+
+    .button-row button.secondary.danger {
+      background: linear-gradient(135deg, #ff8aa8, #ffbc9a);
+      color: #111;
+      box-shadow: 0 14px 24px rgba(255, 105, 144, 0.16);
+    }
+
+    .button-row button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .output-panel {
+      display: grid;
+      gap: 18px;
+      padding: 30px;
+    }
+
+    .output-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .output-header h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .output-body {
+      min-height: 150px;
+      padding: 22px;
+      border-radius: 24px;
+      background: var(--surface-lighter);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 720px;
+    }
+
+    .error-message {
+      color: #ff8fb2;
+      font-size: 0.95rem;
+      min-height: 22px;
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 18px;
+      }
+
+      .hero,
+      .panel,
+      .output-panel {
+        padding: 22px;
+      }
+
+      .button-row {
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.1rem, 7vw, 2.8rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>DumbGenius AI</h1>
+      <p>Ask a fun college-style question and get playful, harmless contrarian advice with a premium feel. Keep it light, silly, and ready for a laugh.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <div>
+          <h2>Your question</h2>
+          <span>Vanilla JavaScript � Frontend-only</span>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <textarea id="question" placeholder="Should I study now or finish memes first?" aria-label="Ask a question"></textarea>
+        <div class="hint">Keep the question light and fun. The answer will stay playful and safe.</div>
+        <div class="button-row">
+          <button id="get-advice" type="button" class="primary">Get DumbGenius</button>
+          <button id="reset-fields" type="button" class="secondary danger">Reset</button>
+          <button id="share-pdf" type="button" class="secondary">Save PDF</button>
+          <button id="copy-output" type="button" class="secondary">Copy</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel output-panel">
+      <div class="output-header">
+        <h3>Wisdom output</h3>
+        <div class="status" id="status-text">Ready for a question.</div>
+      </div>
+      <div class="output-body" id="output-text">Your whimsical wisdom will appear here.</div>
+      <div class="error-message" id="error-text"></div>
+    </section>
+  </main>
+
+  <script>
+    // const HF_TOKEN = "hf_XXXXXXXXXXXXXXXX";
+    const endpoint = "https://router.huggingface.co/v1/chat/completions";
+    const modelName = "moonshotai/Kimi-K2-Instruct";
+
+    const questionInput = document.getElementById("question");
+    const getAdviceButton = document.getElementById("get-advice");
+    const resetButton = document.getElementById("reset-fields");
+    const shareButton = document.getElementById("share-pdf");
+    const copyButton = document.getElementById("copy-output");
+    const outputText = document.getElementById("output-text");
+    const statusText = document.getElementById("status-text");
+    const errorText = document.getElementById("error-text");
+    const outputPanel = document.querySelector('.output-panel');
+
+    function setStatus(message) {
+      statusText.textContent = message;
+    }
+
+    function setLoading(loading) {
+      getAdviceButton.disabled = loading;
+      resetButton.disabled = loading;
+      shareButton.disabled = loading;
+      copyButton.disabled = loading || !outputText.textContent.trim() || outputText.textContent === "Your whimsical wisdom will appear here.";
+      if (loading) {
+        setStatus("Thinking in premium mode...");
+      }
+    }
+
+    function showError(message) {
+      errorText.textContent = message;
+    }
+
+    function clearError() {
+      errorText.textContent = "";
+    }
+
+    function typeWriter(text) {
+      outputText.textContent = "";
+      if (outputPanel) {
+        outputPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      let index = 0;
+      const interval = setInterval(() => {
+        outputText.textContent += text[index] || "";
+        index += 1;
+        if (index > text.length) {
+          clearInterval(interval);
+          if (outputPanel) {
+            outputPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          setStatus("DumbGenius delivered. Enjoy the laugh!");
+          copyButton.disabled = false;
+          shareButton.disabled = false;
+        }
+      }, 24);
+    }
+
+    function buildSystemPrompt() {
+      return `You are "DumbGenius AI", a comedy-first chaotic wisdom generator.
+
+RULES:
+- Always respond in clear, correct English
+- Make answers funny, surprising, and slightly absurd
+- Every response MUST include humor or a twist
+- Give advice that is intentionally opposite or unexpected (but safe)
+- Avoid seriousness — even normal topics must feel funny
+
+STRUCTURE:
+1. Start with a confident statement
+2. Give unusual or funny advice
+3. End with a short punchline or joke
+
+STYLE:
+- Like a funny genius who is confidently wrong
+- Light sarcasm, playful exaggeration
+- No negativity, no harmful content
+- Every answer should make the user smile or softly laugh`;
+    }
+
+    async function fetchAdvice(prompt) {
+      if (!HF_TOKEN) {
+        showError("Add your Hugging Face token to the HF_TOKEN variable.");
+        return;
+      }
+
+      clearError();
+      setLoading(true);
+      if (outputPanel) {
+        outputPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      outputText.textContent = "Gathering witty wisdom...";
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${HF_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [
+              { role: "system", content: buildSystemPrompt() },
+              { role: "user", content: prompt }
+            ]
+          })
+        });
+
+        if (!response.ok) {
+          const body = await response.text();
+          throw new Error(`API error ${response.status}: ${body || response.statusText}`);
+        }
+
+        const data = await response.json();
+        const advice = data?.choices?.[0]?.message?.content?.trim();
+        if (!advice) {
+          throw new Error("No wisdom returned. Try again with a different question.");
+        }
+
+        typeWriter(advice);
+      } catch (err) {
+        outputText.textContent = "Could not fetch wisdom.";
+        showError(err.message || "Something went wrong.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function resetFields() {
+      questionInput.value = "";
+      outputText.textContent = "Your whimsical wisdom will appear here.";
+      clearError();
+      setStatus("Ready for a question.");
+      copyButton.disabled = true;
+      shareButton.disabled = true;
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function shareAsPdf() {
+      const question = questionInput.value.trim();
+      const answer = outputText.textContent.trim();
+      if (!answer || answer === "Your whimsical wisdom will appear here.") {
+        showError("Get wisdom first, then open the download page.");
+        return;
+      }
+
+      const url = `download.html?question=${encodeURIComponent(question || "No question entered.")}&answer=${encodeURIComponent(answer)}`;
+      const downloadPage = window.open(url, "_blank");
+      if (!downloadPage) {
+        showError("Popup blocked. Allow popups to open the download page.");
+      }
+    }
+
+    function copyResponse() {
+      const text = outputText.textContent.trim();
+      if (!text || text === "Your whimsical wisdom will appear here.") return;
+      navigator.clipboard.writeText(text).then(() => {
+        setStatus("Response copied to clipboard.");
+      }).catch(() => {
+        setStatus("Copy failed. Try again.");
+      });
+    }
+
+    getAdviceButton.addEventListener("click", () => {
+      const question = questionInput.value.trim();
+      if (!question) {
+        showError("Please type a question before getting wisdom.");
+        return;
+      }
+      fetchAdvice(question);
+    });
+    resetButton.addEventListener("click", resetFields);
+    shareButton.addEventListener("click", shareAsPdf);
+    copyButton.addEventListener("click", copyResponse);
+    questionInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        getAdviceButton.click();
+      }
+    });
+
+    resetFields();
+  </script>
+</body>
+</html>
